@@ -45,11 +45,11 @@ inline double find_sphere_intersection(const ray &r, const sphere &s)
     vec3 d = r.origin() - s.center();
 
     // based on equation
-    auto a = dot(r.direction(), r.direction());
-    auto b = 2.0 * dot(d, r.direction());
-    auto c = dot(d, d) - s.radius() * s.radius();
+    auto a = r.direction().length_squared();
+    auto b_over_2 = dot(d, r.direction());
+    auto c = d.length_squared() - s.radius() * s.radius();
 
-    auto discriminant = b * b - 4 * a * c;
+    auto discriminant = b_over_2 * b_over_2 - a * c;
 
     if (discriminant < 0)
     {
@@ -57,7 +57,7 @@ inline double find_sphere_intersection(const ray &r, const sphere &s)
     }
     else
     {
-        auto t = (-b - sqrt(discriminant)) / (2.0 * a);
+        auto t = (-b_over_2 - sqrt(discriminant)) / a;
         return t;
     }
 }
