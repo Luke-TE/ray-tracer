@@ -7,16 +7,18 @@
 
 color ray_color(const ray &r)
 {
-    const sphere s(point3(0, 0, -1), 0.5);
+    auto center = point3(0.1, 0.1, -1.0);
+    auto radius = 0.5;
+
+    const sphere s(center, radius);
     vec3 unit_direction = normalize(r.direction());
     auto t = find_sphere_intersection(r, s);
 
-    // if ray intersects sphere, do a different colour
+    // if ray intersects sphere, do a different colour from if not
     if (t > 0)
     {
         vec3 intersection_point = r.at(t);
-        vec3 unit_vector_to_viewer = vec3(0, 0, -1);
-        vec3 surface_normal = normalize(intersection_point - unit_vector_to_viewer);                // surface normal??????
+        vec3 surface_normal = normalize(intersection_point - (vec3)center);
         return 0.5 * color(surface_normal.x() + 1, surface_normal.y() + 1, surface_normal.z() + 1); // colour mapping
     }
 

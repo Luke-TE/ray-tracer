@@ -9,6 +9,7 @@ images/
 
 # Compiled 
 *.exe
+build/*
 
 # User-specific files
 *.rsuser
