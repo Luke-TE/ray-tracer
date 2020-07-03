@@ -9,16 +9,19 @@ color ray_color(const ray &r)
 {
     const sphere s(point3(0, 0, -1), 0.5);
     vec3 unit_direction = normalize(r.direction());
+    auto t = find_sphere_intersection(r, s);
 
     // if ray intersects sphere, do a different colour
-    if (intersects_sphere(r, s))
+    if (t > 0)
     {
-        auto t = 0.5 * (unit_direction.x() + 1.0);
-        return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(1.0, 0.6, 0.2);
+        vec3 intersection_point = r.at(t);
+        vec3 unit_vector_to_viewer = vec3(0, 0, -1);
+        vec3 surface_normal = normalize(intersection_point - unit_vector_to_viewer);                // surface normal??????
+        return 0.5 * color(surface_normal.x() + 1, surface_normal.z() + 1, surface_normal.y() + 1); // colour mapping
     }
 
     // calculating a colour based on the ray's position
-    auto t = 0.5 * (unit_direction.y() + 1.0);
+    t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 
