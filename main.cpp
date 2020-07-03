@@ -3,10 +3,21 @@
 #include "src/color.h"
 #include "src/vec3.h"
 #include "src/ray.h"
+#include "src/sphere.h"
 
 color ray_color(const ray &r)
 {
+    const sphere s(point3(0, 0, -1), 0.5);
     vec3 unit_direction = normalize(r.direction());
+
+    // if ray intersects sphere, do a different colour
+    if (intersects_sphere(r, s))
+    {
+        auto t = 0.5 * (unit_direction.x() + 1.0);
+        return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(1.0, 0.6, 0.2);
+    }
+
+    // calculating a colour based on the ray's position
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
