@@ -4,6 +4,7 @@
 ## Credit to, and get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Generated Images
+images/
 *.ppm
 
 # Compiled 
