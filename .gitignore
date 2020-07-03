@@ -6,6 +6,9 @@
 # Generated Images
 *.ppm
 
+# Compiled 
+*.exe
+
 # User-specific files
 *.rsuser
 *.suo
@@ -363,3 +366,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+main.exe
