@@ -6,6 +6,7 @@
 
 using std::sqrt;
 
+// todo: change from array to fixed vars
 class vec3
 {
 public:
