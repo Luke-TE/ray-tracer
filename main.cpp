@@ -23,7 +23,7 @@ color ray_color(const ray &r, const hittable &world, int bounces_left)
     if (world.hit(r, 0.001, infinity, rec))
     {
         // note: 0.001 used to ignore floating point errors and remove shadow acne
-        point3 target = rec.p + rec.normal + random_in_unit_sphere();
+        point3 target = rec.p + rec.normal + random_unit_vector();
         ray reflected_ray(rec.p, target - rec.p);
         return reflection * ray_color(reflected_ray, world, bounces_left - 1); // colour mapping
     }

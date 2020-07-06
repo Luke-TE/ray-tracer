@@ -141,4 +141,13 @@ vec3 random_in_unit_sphere()
     }
 }
 
+vec3 random_unit_vector()
+{
+    auto z = random_double(-1, 1);
+    auto r = sqrt(1 - z * z);
+
+    auto a = random_double(0, 2 * pi);
+    return vec3(r * cos(a), r * sin(a), z);
+}
+
 #endif
