@@ -6,6 +6,8 @@
 #include "src/ray.h"
 #include "src/sphere.h"
 
+using std::numeric_limits;
+
 color ray_color(const ray &r)
 {
     auto center = point3(0.1, 0.1, -1.0);
@@ -13,8 +15,8 @@ color ray_color(const ray &r)
 
     const sphere s(center, radius);
 
-    auto t_min = std::numeric_limits<double>::min();
-    auto t_max = std::numeric_limits<double>::max();
+    auto t_min = numeric_limits<double>::min();
+    auto t_max = numeric_limits<double>::max();
 
     hit_record rec{};
     auto hit = s.hit(r, t_min, t_max, rec);

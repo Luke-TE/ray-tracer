@@ -13,7 +13,6 @@ public:
     {
     }
 
-    // note: was tmin and tmax in book, not t_min and t_max
     virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const;
     bool set_hit_record(double root, const ray &r, double t_min, double t_max, hit_record &rec) const;
 
@@ -28,7 +27,9 @@ bool sphere::set_hit_record(double root, const ray &r, double t_min, double t_ma
     {
         rec.t = root;
         rec.p = r.at(root);
-        rec.normal = (rec.p - center) / radius;
+        auto outward_normal = (rec.p - center) / radius;
+        rec.set_face_normal(r, outward_normal);
+
         return true;
     }
     return false;
