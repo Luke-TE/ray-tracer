@@ -1,32 +1,24 @@
-#include <iostream>
-#include <limits>
+#include "src/rt_common.h"
 
+#include <iostream>
+
+#include "src/hittable_list.h"
 #include "src/color.h"
-#include "src/vec3.h"
-#include "src/ray.h"
 #include "src/sphere.h"
 
 using std::numeric_limits;
 
-color ray_color(const ray &r)
+color ray_color(const ray &r, const hittable &world)
 {
-    auto center = point3(0.1, 0.1, -1.0);
-    auto radius = 0.5;
+    hit_record rec;
 
-    const sphere s(center, radius);
-
-    auto t_min = numeric_limits<double>::min();
-    auto t_max = numeric_limits<double>::max();
-
-    hit_record rec{};
-    auto hit = s.hit(r, t_min, t_max, rec);
-
-    // if ray intersects sphere, do a different colour
-    if (rec.t > 0)
+    // if ray intersects an object, do a different colour
+    if (world.hit(r, 0, infinity, rec))
     {
-        return 0.5 * color(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1); // colour mapping
+        return 0.5 * (rec.normal + color(1, 1, 1)); // colour mapping
     }
 
+    // background colour
     // calculating a colour based on the ray's position
     vec3 unit_direction = normalize(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -53,6 +45,10 @@ int main()
     auto vp_y_axis_max = vec3(0, viewport_height, 0);
     auto vp_origin = origin - vp_x_axis_max / 2 - vp_y_axis_max / 2 - vp_position;
 
+    hittable_list world;
+    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));      // centre sphere
+    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100)); // ground
+
     for (int j = image_height - 1; j >= 0; j--)
     {
         std::cerr << "\rProgress: " << static_cast<int>((double)(image_height - 1 - j) / image_height * 100) << ' ' << '%' << std::flush;
@@ -63,7 +59,7 @@ int main()
             ray r(origin, vp_origin + u * vp_x_axis_max + v * vp_y_axis_max - origin);
             // todo: maybe normalise this ^ and check performance
 
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
