@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits>
 
 #include "src/color.h"
 #include "src/vec3.h"
@@ -11,19 +12,22 @@ color ray_color(const ray &r)
     auto radius = 0.5;
 
     const sphere s(center, radius);
-    vec3 unit_direction = normalize(r.direction());
-    auto t = find_sphere_intersection(r, s);
 
-    // if ray intersects sphere, do a different colour from if not
-    if (t > 0)
+    auto t_min = std::numeric_limits<double>::min();
+    auto t_max = std::numeric_limits<double>::max();
+
+    hit_record rec{};
+    auto hit = s.hit(r, t_min, t_max, rec);
+
+    // if ray intersects sphere, do a different colour
+    if (rec.t > 0)
     {
-        vec3 intersection_point = r.at(t);
-        vec3 surface_normal = normalize(intersection_point - (vec3)center);
-        return 0.5 * color(surface_normal.x() + 1, surface_normal.y() + 1, surface_normal.z() + 1); // colour mapping
+        return 0.5 * color(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1); // colour mapping
     }
 
     // calculating a colour based on the ray's position
-    t = 0.5 * (unit_direction.y() + 1.0);
+    vec3 unit_direction = normalize(r.direction());
+    auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
 

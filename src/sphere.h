@@ -2,21 +2,57 @@
 #define SPHERE_H
 
 #include "vec3.h"
+#include "ray.h"
+#include "hittable.h"
 
-class sphere
+class sphere : public hittable
 {
 public:
     sphere(const point3 &center, double radius)
-        : r(radius), c(center)
+        : radius(radius), center(center)
     {
     }
 
-    double radius() const { return r; }
-    vec3 center() const { return c; }
+    // note: was tmin and tmax in book, not t_min and t_max
+    virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const;
+    bool set_hit_record(double root, const ray &r, double t_min, double t_max, hit_record &rec) const;
 
 public:
-    double r;
-    vec3 c;
+    double radius;
+    point3 center;
 };
+
+bool sphere::set_hit_record(double root, const ray &r, double t_min, double t_max, hit_record &rec) const
+{
+    if (root < t_max && root > t_min)
+    {
+        rec.t = root;
+        rec.p = r.at(root);
+        rec.normal = (rec.p - center) / radius;
+        return true;
+    }
+    return false;
+}
+
+bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const
+{
+    vec3 d = r.origin() - center;
+
+    // based on (simplified) equation
+    auto a = r.direction().length_squared();
+    auto b_over_2 = dot(d, r.direction());
+    auto c = d.length_squared() - radius * radius;
+
+    auto discriminant = b_over_2 * b_over_2 - a * c;
+
+    if (discriminant > 0)
+    {
+        auto dmnt_sqrted = sqrt(discriminant);
+        auto first_root = (-b_over_2 - dmnt_sqrted) / a;
+        auto second_root = (-b_over_2 + dmnt_sqrted) / a;
+        return set_hit_record(first_root, r, t_min, t_max, rec) || set_hit_record(second_root, r, t_min, t_max, rec);
+    }
+    return false;
+}
 
 #endif
