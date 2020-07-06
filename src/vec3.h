@@ -127,6 +127,7 @@ inline vec3 random(double min, double max)
     return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
 }
 
+// Lambertian Diffuse
 vec3 random_in_unit_sphere()
 {
     // todo: use distributions to improve efficiency
@@ -141,6 +142,7 @@ vec3 random_in_unit_sphere()
     }
 }
 
+// True Lambertian Diffuse
 vec3 random_unit_vector()
 {
     auto z = random_double(-1, 1);
@@ -148,6 +150,19 @@ vec3 random_unit_vector()
 
     auto a = random_double(0, 2 * pi);
     return vec3(r * cos(a), r * sin(a), z);
+}
+
+// Hemispherical Diffuse
+vec3 random_in_hemisphere(const vec3 &normal)
+{
+    vec3 in_unit_sphere = random_in_unit_sphere();
+    if (dot(in_unit_sphere, normal) > 0.0)
+    {
+        // If in the same hemisphere as normal
+        return in_unit_sphere;
+    }
+
+    return -in_unit_sphere;
 }
 
 #endif
