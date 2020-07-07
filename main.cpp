@@ -74,7 +74,10 @@ int main()
     auto metal_a = make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
     world.add(make_shared<sphere>(point3(-1, 0, -1.2), 0.5, metal_a)); // left sphere
 
-    camera cam;
+    auto look_from = point3(-2, 2, 1);
+    auto look_at = point3(0, 0, -1);
+    auto vup = vec3(0, 1, 0);
+    camera cam(look_from, look_at, vup, 20, aspect_ratio);
 
     for (int j = image_height - 1; j >= 0; j--)
     {
