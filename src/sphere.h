@@ -9,6 +9,7 @@
 class sphere : public hittable
 {
 public:
+    sphere() {}
     sphere(const point3 &center, double radius, shared_ptr<material> m)
         : radius(radius), center(center), mat_ptr(m) {}
 

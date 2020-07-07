@@ -7,7 +7,7 @@ class camera
 {
 public:
     camera(point3 look_from, point3 look_at, vec3 vup, double vfov,
-           double aspect_ratio, double aperture)
+           double aspect_ratio, double aperture, double t0 = 0, double t1 = 0)
     {
         // todo: change to horizontal fov (or do both)
         auto theta = degrees_to_radians(vfov);
@@ -29,6 +29,9 @@ public:
         vp_origin = origin - vp_x_axis / 2 - vp_y_axis / 2 - focus_dist * w;
 
         lens_radius = aperture / 2;
+
+        time0 = t0;
+        time1 = t1;
     }
 
     ray get_ray(double s, double t) const
@@ -37,8 +40,9 @@ public:
         vec3 offset = u * rd.x() + v * rd.y();
         // s = proportion along x axis
         // t = proportion along y axis
-        return ray(origin + offset,
-                   vp_origin + s * vp_x_axis + t * vp_y_axis - origin - offset);
+        return ray(vp_origin + s * vp_x_axis + t * vp_y_axis - origin - offset,
+                   origin + offset,
+                   random_double(time0, time1));
     }
 
 private:
@@ -48,6 +52,8 @@ private:
     vec3 vp_y_axis;
     vec3 u, v, w;
     double lens_radius;
+    double time0; // shutter open time
+    double time1; // shutter close time
 };
 
 #endif

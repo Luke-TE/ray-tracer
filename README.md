@@ -11,4 +11,8 @@ Extensions
 - [ ] Triangles, and other advanced shapes
 - [ ] Arbitrary 3D models
 - [ ] Surface Textures
-- [ ] Parallelism
+- [ ] Parallelism, SIMD
+
+Fixups
+- [ ] Convert functions to functions from common headers
+- [ ] Use default arguments more often

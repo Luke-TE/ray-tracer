@@ -5,6 +5,7 @@
 #include "src/hittable_list.h"
 #include "src/color.h"
 #include "src/sphere.h"
+#include "src/moving_sphere.h"
 #include "src/camera.h"
 #include "src/material.h"
 
@@ -57,7 +58,8 @@ int main()
 
     // lambertian spheres
     auto lamb_a = make_shared<lambertian>(color(0.7, 0.3, 0.3));
-    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5, lamb_a)); // centre sphere
+    // world.add(make_shared<sphere>(point3(0, 0, -1), 0.5, lamb_a)); // centre sphere
+    world.add(make_shared<moving_sphere>(point3(0, 0, -1), point3(0, 1, -1), 0, 1, 0.5, 0.75, lamb_a)); // centre sphere
     auto lamb_b = make_shared<lambertian>(color(0.8, 0.8, 0.0));
     world.add(make_shared<sphere>(point3(0, -100.5, -1), 100, lamb_b)); // ground
 
@@ -80,7 +82,7 @@ int main()
     auto vfov = 20;
     auto aperture = 0.5;
 
-    camera cam(look_from, look_at, vup, vfov, aspect_ratio, aperture);
+    camera cam(look_from, look_at, vup, vfov, aspect_ratio, aperture, 0, 1);
 
     for (int j = image_height - 1; j >= 0; j--)
     {

@@ -22,7 +22,7 @@ public:
         // vec3 scatter_direction = rec.normal + random_in_unit_sphere();
         // vec3 scatter_direction = random_in_hemisphere(rec.normal);
         vec3 scatter_direction = rec.normal + random_unit_vector();
-        scattered = ray(rec.p, scatter_direction);
+        scattered = ray(scatter_direction, rec.p, r_in.time());
         attenuation = albedo;
         return true;
     }
@@ -40,7 +40,7 @@ public:
     virtual bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const
     {
         vec3 reflected = reflect(normalize(r_in.direction()), rec.normal);
-        scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
+        scattered = ray(reflected + fuzz * random_in_unit_sphere(), rec.p, r_in.time());
         attenuation = albedo;
         return (dot(scattered.direction(), rec.normal) > 0);
     }
@@ -78,7 +78,7 @@ public:
             r_out = refract(unit_direction, rec.normal, etai_over_etat);
         }
 
-        scattered = ray(rec.p, r_out);
+        scattered = ray(r_out, rec.p, r_in.time());
         return true;
     }
 
