@@ -6,7 +6,8 @@
 class camera
 {
 public:
-    camera(point3 look_from, point3 look_at, vec3 vup, double vfov, double aspect_ratio)
+    camera(point3 look_from, point3 look_at, vec3 vup, double vfov,
+           double aspect_ratio, double aperture)
     {
         // todo: change to horizontal fov (or do both)
         auto theta = degrees_to_radians(vfov);
@@ -14,29 +15,39 @@ public:
         // Viewport details - basically the screen that displays the image
         auto viewport_height = 2.0 * h;
         auto viewport_width = aspect_ratio * viewport_height;
+        auto focus_dist = (look_from - look_at).length();
 
-        auto w = normalize(look_from - look_at); // reverse looking direction
+        w = normalize(look_from - look_at); // reverse looking direction
         // projecting vup onto the plane orthogonal to w via cross-product twice
-        auto u = normalize(cross(vup, w));
-        auto v = cross(w, u);
+        u = normalize(cross(vup, w));
+        v = cross(w, u);
 
         origin = look_from;
-        vp_x_axis_max = viewport_width * u;
-        vp_y_axis_max = viewport_height * v;
+        vp_x_axis = focus_dist * viewport_width * u;
+        vp_y_axis = focus_dist * viewport_height * v;
 
-        vp_origin = origin - vp_x_axis_max / 2 - vp_y_axis_max / 2 - w;
+        vp_origin = origin - vp_x_axis / 2 - vp_y_axis / 2 - focus_dist * w;
+
+        lens_radius = aperture / 2;
     }
 
-    ray get_ray(double u, double v) const
+    ray get_ray(double s, double t) const
     {
-        return ray(origin, vp_origin + u * vp_x_axis_max + v * vp_y_axis_max - origin);
+        vec3 rd = lens_radius * random_in_unit_disk();
+        vec3 offset = u * rd.x() + v * rd.y();
+        // s = proportion along x axis
+        // t = proportion along y axis
+        return ray(origin + offset,
+                   vp_origin + s * vp_x_axis + t * vp_y_axis - origin - offset);
     }
 
 private:
     point3 origin;
     point3 vp_origin;
-    vec3 vp_x_axis_max;
-    vec3 vp_y_axis_max;
+    vec3 vp_x_axis;
+    vec3 vp_y_axis;
+    vec3 u, v, w;
+    double lens_radius;
 };
 
 #endif
