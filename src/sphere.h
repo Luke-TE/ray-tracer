@@ -4,14 +4,13 @@
 #include "vec3.h"
 #include "ray.h"
 #include "hittable.h"
+#include "material.h"
 
 class sphere : public hittable
 {
 public:
-    sphere(const point3 &center, double radius)
-        : radius(radius), center(center)
-    {
-    }
+    sphere(const point3 &center, double radius, shared_ptr<material> m)
+        : radius(radius), center(center), mat_ptr(m) {}
 
     virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const;
     bool set_hit_record(double root, const ray &r, double t_min, double t_max, hit_record &rec) const;
@@ -19,6 +18,7 @@ public:
 public:
     double radius;
     point3 center;
+    shared_ptr<material> mat_ptr;
 };
 
 bool sphere::set_hit_record(double root, const ray &r, double t_min, double t_max, hit_record &rec) const
@@ -29,6 +29,7 @@ bool sphere::set_hit_record(double root, const ray &r, double t_min, double t_ma
         rec.p = r.at(root);
         auto outward_normal = (rec.p - center) / radius;
         rec.set_face_normal(r, outward_normal);
+        rec.mat_ptr = mat_ptr;
 
         return true;
     }

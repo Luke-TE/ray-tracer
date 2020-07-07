@@ -6,6 +6,7 @@
 #include "src/color.h"
 #include "src/sphere.h"
 #include "src/camera.h"
+#include "src/material.h"
 
 color ray_color(const ray &r, const hittable &world, int bounces_left)
 {
@@ -14,7 +15,7 @@ color ray_color(const ray &r, const hittable &world, int bounces_left)
     // Used to limit recursion depth
     if (bounces_left <= 0)
     {
-        return color(0.0, 0.0, 0.0);
+        return color(0, 0, 0);
     }
 
     double reflection = 0.5;
@@ -24,11 +25,13 @@ color ray_color(const ray &r, const hittable &world, int bounces_left)
     {
         // note: 0.001 used to ignore floating point errors and remove shadow acne
 
-        // point3 target = rec.p + rec.normal + random_in_unit_sphere();
-        // point3 target = rec.p + rec.normal + random_unit_vector();
-        point3 target = rec.p + random_in_hemisphere(rec.normal);
-        ray reflected_ray(rec.p, target - rec.p);
-        return reflection * ray_color(reflected_ray, world, bounces_left - 1); // colour mapping
+        ray scattered_ray;
+        color attenuation;
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered_ray))
+        {
+            return attenuation * ray_color(scattered_ray, world, bounces_left - 1);
+        }
+        return color(0, 0, 0);
     }
 
     // background colour
@@ -51,9 +54,25 @@ int main()
               << image_width << ' ' << image_height << "\n255\n";
 
     hittable_list world;
-    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));      // centre sphere
-    world.add(make_shared<sphere>(point3(50, 0.5, -50), 40));   // right sphere
-    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100)); // ground
+
+    // lambertian spheres
+    auto lamb_a = make_shared<lambertian>(color(0.7, 0.3, 0.3));
+    world.add(make_shared<sphere>(point3(0, 0, -1), 0.5, lamb_a)); // centre sphere
+    auto lamb_b = make_shared<lambertian>(color(0.8, 0.8, 0.0));
+    world.add(make_shared<sphere>(point3(0, -100.5, -1), 100, lamb_b)); // ground
+
+    // dielectric sphere
+    auto dielectric_a = make_shared<dielectric>(1.5);
+    world.add(make_shared<sphere>(point3(1, 0, -0.9), 0.5, dielectric_a)); // right sphere
+
+    // hollow sphere bubble
+    // negative radius -> same geometry, inverted surface normals
+    auto dielectric_b = make_shared<dielectric>(1.5);
+    world.add(make_shared<sphere>(point3(1, 0, -0.9), -0.45, dielectric_b)); // right sphere
+
+    // metal sphere
+    auto metal_a = make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
+    world.add(make_shared<sphere>(point3(-1, 0, -1.2), 0.5, metal_a)); // left sphere
 
     camera cam;
 
