@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <random>
+#include <chrono>
 
 // Usings
 
@@ -28,7 +29,7 @@ inline double degrees_to_radians(double degrees)
 
 inline double random_double()
 {
-    // Uniform Distribution
+    // Uniform Real Distribution
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
     // Mersenne Twister 19937 pseudo-random generator
@@ -39,6 +40,17 @@ inline double random_double()
 inline double random_double(double min, double max)
 {
     return min + (max - min) * random_double();
+}
+
+inline double random_axis()
+{
+    // Uniform Int Distribution
+    static std::uniform_int_distribution<int> distribution(0, 2);
+
+    // Mersenne Twister 19937 pseudo-random generator
+    static std::mt19937 generator;
+
+    return distribution(generator);
 }
 
 inline double clamp(double x, double min, double max)

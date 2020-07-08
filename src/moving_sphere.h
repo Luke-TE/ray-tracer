@@ -28,6 +28,7 @@ public:
     }
 
     virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const;
+    virtual bool bounding_box(double t0, double t1, aabb &output_box) const;
 
     point3 center(double time) const;
     double moving_sphere::radius(double time) const;
@@ -54,6 +55,15 @@ double moving_sphere::radius(double time) const
 bool moving_sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const
 {
     return sphere(center(r.time()), radius(r.time()), mat_ptr).hit(r, t_min, t_max, rec);
+}
+
+bool moving_sphere::bounding_box(double t0, double t1, aabb &output_box) const
+{
+    aabb starting_box, ending_box;
+    starting_sphere.bounding_box(t0, t1, starting_box);
+    ending_sphere.bounding_box(t0, t1, ending_box);
+    output_box = surrounding_box(starting_box, ending_box);
+    return true;
 }
 
 #endif

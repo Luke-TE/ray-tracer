@@ -8,6 +8,7 @@
 #include "src/moving_sphere.h"
 #include "src/camera.h"
 #include "src/material.h"
+#include "src/bvh.h"
 
 color ray_color(const ray &r, const hittable &world, int bounces_left)
 {
@@ -45,7 +46,7 @@ color ray_color(const ray &r, const hittable &world, int bounces_left)
 int main()
 {
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 384;
+    const int image_width = 768;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
     const int samples_per_pixel = 100; // antialiasing resolution
@@ -84,6 +85,10 @@ int main()
 
     camera cam(look_from, look_at, vup, vfov, aspect_ratio, aperture, 0, 1);
 
+    bvh_node world_bvh(world, 0, 1);
+
+    auto starting_time = std::chrono::high_resolution_clock::now();
+
     for (int j = image_height - 1; j >= 0; j--)
     {
         std::cerr << "\rProgress: " << static_cast<int>((double)(image_height - 1 - j) / image_height * 100) << ' ' << '%' << std::flush;
@@ -95,11 +100,15 @@ int main()
                 auto u = (i + random_double() - 0.5) / (image_width - 1);  // proportion (0 to 1) along x-axis (randomized)
                 auto v = (j + random_double() - 0.5) / (image_height - 1); // proportion (0 to 1) along y-axis (randomized)
                 ray r = cam.get_ray(u, v);
-                pixel_color += ray_color(r, world, max_bounces);
+                pixel_color += ray_color(r, world_bvh, max_bounces);
             }
             write_color(std::cout, pixel_color, samples_per_pixel);
         }
     }
 
+    auto ending_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed_time = ending_time - starting_time;
+
     std::cerr << "\nDone.\n";
+    std::cerr << "Finished in " << elapsed_time.count() << " seconds\n";
 }

@@ -14,6 +14,7 @@ public:
         : radius(radius), center(center), mat_ptr(m) {}
 
     virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const;
+    virtual bool bounding_box(double t0, double t1, aabb &output_box) const;
     bool set_hit_record(double root, const ray &r, double t_min, double t_max, hit_record &rec) const;
 
 public:
@@ -56,6 +57,13 @@ bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) cons
         return set_hit_record(first_root, r, t_min, t_max, rec) || set_hit_record(second_root, r, t_min, t_max, rec);
     }
     return false;
+}
+
+bool sphere::bounding_box(double t0, double t1, aabb &output_box) const
+{
+    output_box = aabb(center - vec3(radius, radius, radius),
+                      center + vec3(radius, radius, radius));
+    return true;
 }
 
 #endif
